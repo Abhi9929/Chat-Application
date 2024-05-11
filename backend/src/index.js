@@ -2,10 +2,8 @@ import ConnectDB from './db/index.js';
 import app from './app.js';
 import dotenv from 'dotenv';
 import { Server } from 'socket.io';
-import path from 'path';
-import express from 'express';
 
-const result = dotenv.config({ path: 'backend/.env' });
+const result = dotenv.config();
 if (result.error) {
   console.error('error at result: ', result.error);
   process.exit(1);
