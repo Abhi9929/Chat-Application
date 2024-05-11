@@ -3,7 +3,7 @@ import app from './app.js';
 import dotenv from 'dotenv';
 import { Server } from 'socket.io';
 
-const result = dotenv.config();
+dotenv.config();
 
 ConnectDB()
   .then(() => {
