@@ -21,7 +21,7 @@ ConnectDB()
     const io = new Server(server, {
       pingTimeout: 6000,
       cors: {
-        origin: ['http://localhost:5173', 'http://192.168.91.191:5173'],
+        origin: ['http://localhost:5173'],
       },
     });
 
