@@ -16,7 +16,7 @@ ConnectDB()
       cors: {
         origin: [
           'http://localhost:5173',
-          'https://chat-application-gamma-jade.vercel.app/',
+          'https://chat-application-gamma-jade.vercel.app',
         ],
       },
     });
