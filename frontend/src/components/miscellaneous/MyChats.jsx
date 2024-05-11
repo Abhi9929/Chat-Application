@@ -2,14 +2,15 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack, Text, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
-import { ChatState } from '../../../../backend/src/Context/ChatProvider';
+import { ChatState } from '../../Context/ChatProvider';
 import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 import ChatLoading from './ChatLaoding';
 import { getSender } from '../../config/ChatLogic';
 import GroupChatModel from './GroupChatModel';
+import {conf} from '../../config/config'
 
-function MyChats() {
+function MyChats({ fetchAgain }) {
   const [loggedUser, setLoggedUser] = useState();
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
@@ -17,7 +18,7 @@ function MyChats() {
 
   const fetchChats = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:8000/api/chat`, {
+      const { data } = await axios.get(`${conf.BACKEND_URI}/api/chat`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
@@ -41,17 +42,17 @@ function MyChats() {
     setLoggedUser(JSON.parse(localStorage.getItem('userInfo')));
 
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
 
   return (
     <Box
       display={{ base: selectedChat ? 'none' : 'flex', md: 'flex' }}
-      w={{ base: '100%', md: '36%' }}
+      w={{ base: '100%', md: '33%' }}
       className='flex-col items-center p-2 bg-white rounded-lg'
     >
       <Box className='pb-3 px-2 text-base sm:text-xl flex w-full justify-between items-center gap-1'>
         My Chats
-        <GroupChatModel>
+        <GroupChatModel fetchAgain={fetchAgain}>
           <Button
             d='flex'
             fontSize={{ base: '14px', md: '14px', lg: '17px' }}

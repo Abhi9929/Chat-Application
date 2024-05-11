@@ -15,10 +15,11 @@ import {
   Box,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import { ChatState } from '../../../../backend/src/Context/ChatProvider';
+import { ChatState } from '../../Context/ChatProvider';
 import axios from 'axios';
 import UserListItem from '../userAvatar/UserList';
 import UserBadgeItem from '../userAvatar/UserBadgeItem';
+import { conf } from '../../config/config';
 
 function GroupChatModel({ children }) {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -32,7 +33,49 @@ function GroupChatModel({ children }) {
 
   const { user, chats, setChats } = ChatState();
 
-  const handleSubmit = () => {};
+  const handleSubmit = async () => {
+    if (!groupChatName || !selectedUsers) {
+      toast({
+        title: 'Please fill all the fields',
+        status: 'warning',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        `${conf.BACKEND_URI}/api/chat/group`,
+        {
+          name: groupChatName,
+          users: JSON.stringify(selectedUsers.map((u) => u._id)),
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${JSON.parse(
+              localStorage.getItem('token')
+            )}`,
+          },
+        }
+      );
+      const { data } = res.data;
+      console.log(data);
+      setChats([data, ...chats]);
+      onClose();
+      toast({
+        title: 'New Group Chat Created!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'bottom',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSearch = async (query) => {
     setSearch(query);
@@ -43,7 +86,7 @@ function GroupChatModel({ children }) {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `http://localhost:8000/api/users/search?s=${query}`,
+        `${conf.BACKEND_URI}/api/users/search?s=${query}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -69,7 +112,7 @@ function GroupChatModel({ children }) {
     }
   };
 
-  console.log(selectedUsers);
+  // console.log(selectedUsers);
   const handleGroup = async (userToAdd) => {
     if (selectedUsers.includes(userToAdd)) {
       toast({
@@ -82,7 +125,7 @@ function GroupChatModel({ children }) {
       return;
     }
     setSelectedUsers([...selectedUsers, userToAdd]);
-    console.log(selectedUsers);
+    // console.log(selectedUsers);
   };
 
   const handleDelete = (user) => {
@@ -116,11 +159,11 @@ function GroupChatModel({ children }) {
               />
             </FormControl>
             {/* selected users  */}
-            <Box className='flex py-2 px-3 mb-3 justify-start items-start' >
+            <Box className='flex mb-3 justify-start items-start flex-wrap gap-2'>
               {selectedUsers?.map((u) => (
                 <UserBadgeItem
-                  key={user._id}
-                  user={user}
+                  key={u._id}
+                  user={u}
                   handleFunction={() => handleDelete(u)}
                 />
               ))}
@@ -135,7 +178,7 @@ function GroupChatModel({ children }) {
                   <UserListItem
                     key={user._id}
                     user={user}
-                    handleFunction={() => handleGroup(user._id)}
+                    handleFunction={() => handleGroup(user)}
                   />
                 ))
             )}

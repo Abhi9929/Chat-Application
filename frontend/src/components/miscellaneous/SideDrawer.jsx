@@ -17,21 +17,22 @@ import {
   DrawerCloseButton,
   Input,
   useDisclosure,
-  List,
-  ListItem,
   useToast,
   Spinner,
 } from '@chakra-ui/react';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { ChatState } from '../../../../backend/src/Context/ChatProvider';
+import { ChatState } from '../../Context/ChatProvider';
 import ProfileModal from './ProfileModal';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ChatLaoding from './ChatLaoding';
 import UserListItem from '../userAvatar/UserList';
+import { getSender } from '../../config/ChatLogic';
+import '../../assets/style.css';
+import { conf } from '../../config/config';
 
 function SideDrawer() {
   const [search, setSearch] = useState('');
@@ -39,7 +40,14 @@ function SideDrawer() {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
 
-  const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -65,7 +73,7 @@ function SideDrawer() {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `http://localhost:8000/api/users/search?s=${search}`,
+        `${conf.BACKEND_URI}/api/users/search?s=${search}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -95,7 +103,7 @@ function SideDrawer() {
     try {
       setLoading(true);
       const { data } = await axios.post(
-        `http://localhost:8000/api/chat`,
+        `${conf.BACKEND_URI}/api/chat`,
         {
           userId,
         },
@@ -108,7 +116,7 @@ function SideDrawer() {
           },
         }
       );
-      console.log(data.data);
+      // console.log(data.data);
       // if there is a new chat then it will append it in the existing chat
       if (!chats.find((c) => c._id === data.data._id)) {
         setChats([data.data, ...chats]);
@@ -141,13 +149,35 @@ function SideDrawer() {
           </Button>
         </Tooltip>
 
-        <Text className='text-2xl'>Talk-A-Tive</Text>
+        <Text className='text-2xl'>Chatpad</Text>
 
         <div>
           <Menu>
             <MenuButton p={1}>
-              <NotificationsIcon fontSize='small' className='m-1' />
+              <div className='notification-badge'>
+                <NotificationsIcon fontSize='medium' className='m-1' />
+                {notification.length !== 0 && (
+                  <span className='badge'>{ notification.length}</span>
+                )}
+              </div>
             </MenuButton>
+            <MenuList pl={2}>
+              {console.log(notification)}
+              {!notification.length && 'No New Messages'}
+              {notification.map((notif) => (
+                <MenuItem
+                  key={notif._id}
+                  onClick={() => {
+                    setSelectedChat(notif.chat);
+                    setNotification(notification.filter((n) => n !== notif));
+                  }}
+                >
+                  {notif.chat.isGroupChat
+                    ? `New Message in ${notif?.chat?.chatName}`
+                    : `New Message from ${getSender(user, notif.chat.users)}`}
+                </MenuItem>
+              ))}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton as={Button} rightIcon={<KeyboardArrowDownIcon />}>
@@ -170,33 +200,32 @@ function SideDrawer() {
           <DrawerCloseButton />
           <DrawerHeader>Search User</DrawerHeader>
           <DrawerBody>
-            
-          <Box className='flex gap-2 px-2'>
-            <Input
-              placeholder='Type here...'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button colorScheme='blue' onClick={handleSearch}>
-              Go
-            </Button>
-          </Box>
+            <Box className='flex gap-2 px-2'>
+              <Input
+                placeholder='Type here...'
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Button colorScheme='blue' onClick={handleSearch}>
+                Go
+              </Button>
+            </Box>
 
-          <Box className='mt-5 px-2'>
-            {loading ? (
-              <ChatLaoding />
-            ) : (
-              searchResult?.map((user) => (
-                <UserListItem
-                key={user._id}
-                user={user}
-                handleFunction={() => accesschat(user._id)}
-                />
-              ))
-            )}
-            {loadingChat && <Spinner ml={'auto'} display={'flex'} />}
-          </Box>
-    </DrawerBody>
+            <Box className='mt-5 px-2'>
+              {loading ? (
+                <ChatLaoding />
+              ) : (
+                searchResult?.map((user) => (
+                  <UserListItem
+                    key={user._id}
+                    user={user}
+                    handleFunction={() => accesschat(user._id)}
+                  />
+                ))
+              )}
+              {loadingChat && <Spinner ml={'auto'} display={'flex'} />}
+            </Box>
+          </DrawerBody>
 
           <DrawerFooter position={'absolute'} bottom={1} right={-5}>
             <Button variant='outline' mr={3} onClick={onClose}>

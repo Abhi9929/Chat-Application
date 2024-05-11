@@ -1,7 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { optional } from 'zod';
-
 
 const userSchema = new Schema(
   {
@@ -21,7 +19,8 @@ const userSchema = new Schema(
     pic: {
       type: String,
       required: false,
-      default: 'https://avatar.iran.liara.run/public/boy?',
+      default:
+        'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg',
     },
     isAdmin: {
       type: Boolean,
@@ -38,7 +37,6 @@ userSchema.pre('save', async function (next) {
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  // next();
 });
 
 // comparing hashed password woth original password
@@ -49,3 +47,6 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 const User = mongoose.model('User', userSchema);
 
 export { User };
+
+
+// link: https://avatar.iran.liara.run/public/boy?

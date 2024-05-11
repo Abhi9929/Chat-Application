@@ -15,7 +15,6 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { PasswordField } from '../components/auth/PasswordField';
 import Login from '../components/auth/Login';
 import Signup from '../components/auth/Signup';
 
@@ -24,11 +23,11 @@ function Home() {
     <Container className='w-full h-full flex justify-center items-center'>
       <Container className='text-center'>
         <Stack spacing={'4'}>
-          <Box className='rounded-lg bg-white border'>
+          {/* <Box className='rounded-lg bg-white border'>
             <Text fontSize={'4xl'} className='text-black font-normal'>
-              Talk-A-Tive
+              Memospark
             </Text>
-          </Box>
+          </Box> */}
           <Box className='bg-white w-full rounded-lg border p-2'>
             <Tabs variant='soft-rounded'>
               <TabList>

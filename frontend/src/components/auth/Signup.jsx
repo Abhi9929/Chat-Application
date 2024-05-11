@@ -100,7 +100,7 @@ function Signup() {
 
     try {
       const { data } = await axios.post(
-        'http://localhost:8000/api/users/signup',
+        `${conf.BACKEND_URI}/api/users/signup`,
         {
           name,
           email,

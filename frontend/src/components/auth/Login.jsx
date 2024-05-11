@@ -11,7 +11,7 @@ import { useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import axios from "axios";
-
+import { conf } from '../../config/config';
 
 function Login() {
   const toast = useToast();
@@ -25,7 +25,7 @@ function Login() {
   useEffect(() => {
     const token = JSON.parse(localStorage?.getItem('token'));
     if (token) navigate('/chats');
-  });
+  }, []);
 
   const submitHandler = async () => {
     setLoading(true);
@@ -43,7 +43,7 @@ function Login() {
 
     try {
       const { data } = await axios.post(
-        'http://localhost:8000/api/users/login',
+        `${conf.BACKEND_URI}/api/users/login`,
         {
           email,
           password,
