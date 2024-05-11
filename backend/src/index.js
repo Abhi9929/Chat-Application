@@ -4,10 +4,6 @@ import dotenv from 'dotenv';
 import { Server } from 'socket.io';
 
 const result = dotenv.config();
-if (result.error) {
-  console.error('error at result: ', result.error);
-  process.exit(1);
-}
 
 ConnectDB()
   .then(() => {
