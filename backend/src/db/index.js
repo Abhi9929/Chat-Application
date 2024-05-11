@@ -5,7 +5,7 @@ const DB_NAME = 'chat_app';
 const ConnectDB = async () => {
   try {
     const connectionInstance = await mongoose.connect(
-      `${process.env.BACKEND_URI}${DB_NAME}`
+      `${process.env.MONGODB_URI}${DB_NAME}`
     );
     console.log(
       `\n MONGODB connected !! DB HOST: ${connectionInstance.connection.host}`
