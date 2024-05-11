@@ -9,8 +9,8 @@ ConnectDB()
   .then(() => {
     const PORT = process.env.PORT || 8001;
     const HOST = process.env.HOST || 'localhost';
-    const server = app.listen(PORT, HOST, () => {
-      console.log(`⚙️  Server is listening on http://${HOST}:${PORT}`);
+    const server = app.listen(PORT, () => {
+      console.log(`⚙️  Server is listening on port :${PORT}`);
     });
     const io = new Server(server, {
       pingTimeout: 6000,
