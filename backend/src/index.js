@@ -14,7 +14,10 @@ ConnectDB()
     const io = new Server(server, {
       pingTimeout: 6000,
       cors: {
-        origin: ['http://localhost:5173'],
+        origin: [
+          'http://localhost:5173',
+          'https://chat-application-gamma-jade.vercel.app/',
+        ],
       },
     });
 
