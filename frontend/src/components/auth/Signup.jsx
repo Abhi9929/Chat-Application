@@ -4,6 +4,7 @@ import { useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { conf } from '../../config/config';
 
 function Signup() {
   const toast = useToast();
@@ -24,6 +25,7 @@ function Signup() {
 
   // image uploading
   const postDetails = (pics) => {
+    console.log(pics);
     setLoading(true);
     if (pics === undefined) {
       toast({
@@ -45,7 +47,6 @@ function Signup() {
       data.append('file', pics);
       data.append('upload_preset', 'chat_app');
       data.append('cloud_name', 'dnswvcjp3');
-
       fetch('https://api.cloudinary.com/v1_1/dnswvcjp3/image/upload', {
         method: 'post',
         body: data,
@@ -53,7 +54,7 @@ function Signup() {
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
-          console.log(data.url.toString());
+          // console.log(data.url.toString());
           setLoading(false);
         })
         .catch((err) => {
@@ -74,7 +75,6 @@ function Signup() {
   };
 
   const submitHandler = async (e) => {
-    setLoading(true);
     if (!name || !email || !password || !confirmPassword) {
       toast({
         title: 'Please Fill the Fileds!',
@@ -99,13 +99,17 @@ function Signup() {
     }
 
     try {
+      setLoading(true);
       const { data } = await axios.post(
         `${conf.BACKEND_URI}/api/users/signup`,
         {
           name,
           email,
           password,
-          pic,
+          pic:
+            pic === null
+              ? 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg'
+              : pic,
         },
         {
           headers: {
@@ -121,15 +125,17 @@ function Signup() {
         position: 'bottom',
       });
 
-      const { createdUser ,token } = data.data;
+      console.log(data);
+      const { createdUser, token } = data.data;
       localStorage.setItem('token', JSON.stringify(token));
       localStorage.setItem('userInfo', JSON.stringify(createdUser));
       setLoading(false);
       navigate('/chats');
     } catch (error) {
+      console.log(error);
       toast({
         title: 'Error Occured!',
-        description: error.response.data.message,
+        description: error.response.data?.message,
         status: 'error',
         duration: '3000',
         isClosable: true,

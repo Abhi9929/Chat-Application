@@ -152,7 +152,6 @@ function UpdateGroupChatModal({ fetchAgain, setFetchAgain, fetchMessages }) {
   };
 
   const handleSearch = async () => {
-    console.log(debouncedSearch);
     if (!debouncedSearch) {
       setSearchResult([]);
       return;

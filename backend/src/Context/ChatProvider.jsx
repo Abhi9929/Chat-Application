@@ -12,14 +12,12 @@ const ChatProvider = ({ children }) => {
   useEffect(() => {
     const token = JSON.parse(localStorage?.getItem('token'));
 
-    
     const userInfo = JSON.parse(localStorage?.getItem('userInfo'));
     setUser(userInfo);
 
     if (!token || !userInfo) navigate('/');
     else navigate('/chats');
-
-  }, []);
+  }, [navigate]);
 
   return (
     <ChatContext.Provider

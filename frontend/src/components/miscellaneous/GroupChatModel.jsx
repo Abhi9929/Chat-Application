@@ -13,13 +13,15 @@ import {
   FormControl,
   Input,
   Box,
+  Spinner,
 } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatState } from '../../Context/ChatProvider';
 import axios from 'axios';
 import UserListItem from '../userAvatar/UserList';
 import UserBadgeItem from '../userAvatar/UserBadgeItem';
 import { conf } from '../../config/config';
+import { useDebounce } from '../../hooks/DebounceSearch';
 
 function GroupChatModel({ children }) {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -30,6 +32,7 @@ function GroupChatModel({ children }) {
   const [loading, setLoading] = useState(false);
 
   const toast = useToast();
+  const debouncedSearch = useDebounce(search, 500);
 
   const { user, chats, setChats } = ChatState();
 
@@ -77,16 +80,21 @@ function GroupChatModel({ children }) {
     }
   };
 
-  const handleSearch = async (query) => {
-    setSearch(query);
-    if (!query) {
+
+  useEffect(() => {
+    handleSearch();
+  }, [debouncedSearch, search]);
+
+
+  const handleSearch = async () => {
+    if (!debouncedSearch) {
       setSearchResult([]);
       return;
     }
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `${conf.BACKEND_URI}/api/users/search?s=${query}`,
+        `${conf.BACKEND_URI}/api/users/search?s=${debouncedSearch}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -155,7 +163,10 @@ function GroupChatModel({ children }) {
               <Input
                 placeholder='Add Users eg: John, Kia, Lamar'
                 mb={1}
-                onChange={(e) => handleSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  handleSearch();
+                }}
               />
             </FormControl>
             {/* selected users  */}
@@ -170,7 +181,7 @@ function GroupChatModel({ children }) {
             </Box>
             {/* render searched users */}
             {loading ? (
-              <div>Loading...</div>
+              <Spinner size={'lg'} />
             ) : (
               searchResult
                 ?.slice(0, 3)
